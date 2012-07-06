@@ -1,0 +1,1 @@
+SUBDIRS=libJPLogger include exampleProgram
