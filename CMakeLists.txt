@@ -11,6 +11,10 @@ ELSE()
    SET(INSTALL_INCS ${CMAKE_HOME_DIRECTORY}/include )
 ENDIF()
 
+IF( EXISTS ${INSTALL_LIBS}/liblogger.so )
+	return()
+ENDIF()
+
 
 SET(LIBRARY_OUTPUT_PATH .)
 SET(EXECUTABLE_OUTPUT_PATH .)
@@ -19,12 +23,23 @@ PROJECT(logger)
 INCLUDE_DIRECTORIES( include lib )
 
 ADD_SUBDIRECTORY( src lib )
+ADD_SUBDIRECTORY( exampleProgram bin )
 
+#####################################
+# Search for needed lib
+#####################################
+#####################################
+# Instalation section
+#####################################
 INSTALL( FILES include/libJPLogger.h
          DESTINATION ${INSTALL_INCS} )
 
 INSTALL( FILES lib/liblogger.so
          DESTINATION ${INSTALL_LIBS} )
+
+#####################################
+# Others
+#####################################
 IF( UNIX )
    ADD_CUSTOM_TARGET( distclean @@echo cleaning for source distribution)
   SET(DISTCLEANED
@@ -39,6 +54,8 @@ IF( UNIX )
    *~
    lib
    CMakeFiles
+   bin
+   install_*
   )
 
   ADD_CUSTOM_COMMAND(

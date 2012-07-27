@@ -90,7 +90,11 @@ Logger::~Logger(){
 
 int
 Logger::setFile(std::string filename ){
-	myfile.open( filename.c_str() , ios::app);
+	debugFun( "change filename["<<filename.c_str()<<"]\n");
+	if(myfile.is_open()){
+		myfile.close();
+	}
+	myfile.open( filename.c_str() , ios::app );
 	if( !myfile.is_open() ){
 		cerr << "Log file:[" << filename <<
 			"] could not be opened" << endl;
@@ -143,7 +147,7 @@ Logger::setLogLvl( std::string module , int logsev, int type)
 		}
 	}
 
-	cout << logLvls << endl;
+	//cout << logLvls << endl;
 
 	return 0;
 }
@@ -211,36 +215,39 @@ bool Logger::writable( std::string module , int logsev, int type )
 	//No specific configuration for the module
 	// Assumption: M_LOG_ALL_LVL is always set'ed with the log level by default
 	if( logLvls.end() == it ){
-		cout << "No cfg for module" << endl;
-		if(  logLvls[CONST_DEFMODULE][M_LOG_ALLLVL] < logsev )
+		//cout << "No cfg for module" << endl;
+		//cout <<"No cfg for module:"<< logLvls[CONST_DEFMODULE][M_LOG_ALLLVL] << ">" <<logsev<< endl;
+		if(  logLvls[CONST_DEFMODULE][M_LOG_ALLLVL] > logsev )
 			writable = false;
 	}else{
 		it1 = logLvls[module].find(actType);
 		//There is no configuration for the log level
 		if( logLvls[module].end() == it1 )
 		{
-			cout << "not cfg for log level" << endl;
+			//cout << "not cfg for log level" << endl;
 			itl1 = logLvls[module].find(M_LOG_ALLLVL);
 			// No configuration in this module for ALL levels
 			if( logLvls[module].end() == itl1 ){
 				//Assumption M_LOG_ALLLVL is always set'ed with the log level by default
+				//cout <<"Mod exist but no cfg for lvl, getting default"<< logLvls[CONST_DEFMODULE][M_LOG_ALLLVL] << ">" <<logsev<< endl;
 				if( logLvls[CONST_DEFMODULE][M_LOG_ALLLVL] > logsev )
 						writable = false;
 			// Configuration for all levels found
 			}else if( logLvls[module][M_LOG_ALLLVL] > logsev )
-					writable = false;
+				writable = false;
+			//cout <<"Mod exist but no cfg for lvl, getting default of module"<< logLvls[module][M_LOG_ALLLVL] << ">" <<logsev<< endl;
 		}else//There is a configuration for the log level
 		{
-			cout << logLvls[module][actType] << ">" <<logsev<< endl;
+			//cout <<"Has cfg for mode/type:"<< logLvls[module][actType] << ">" <<logsev<< endl;
 			if( logLvls[module][actType] > logsev )
 			{
-				cout << "actlvl < logsev" << endl;
+				//cout << "actlvl < logsev" << endl;
 				writable = false;
 			}
 		}
 
 	}
-	cout << (writable?"writing":"Not writing") << endl;
+	//cout << (writable?"writing":"Not writing") << endl;
 	return writable;
 }
 int Logger::write( std::string message, std::string module , int type ){
@@ -270,6 +277,7 @@ int Logger::write( std::string message, std::string module , int type ){
  */
 int
 Logger::setLoggerLevel( const LogModules lvls){
+	debugFun( "Set new log level");
 	Logger::logLvls.clear();
 	Logger::logLvls = (LogModules)lvls;
 }
@@ -281,13 +289,14 @@ Logger::setLoggerLevel( const LogModules lvls){
  */
 int
 Logger::copyLoggerDef( Logger * logger ){
-	cout << "copyLoggerDef"<<endl;
+	//cout << "copyLoggerDef"<<endl;
+	debugFun( "Copying the logger[");
 	try{
 		setFile(logger->getFile());
 	}catch( LoggerExpFileError &e ){
 		cerr << e.what()<< endl;
 	}
-	cout << "going out"<<endl;
+	//cout << "going out"<<endl;
 	return setLoggerLevel( logger->getLogLvls() );
 
 }

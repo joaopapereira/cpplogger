@@ -12,7 +12,7 @@
                Here the script will be called exampleProgram.
  ============================================================================
  */
-#define DEBUG 1
+#define DEBUG 0
 #include "libJPLogger.h"
 
 // With this option will disable the debug to screen and do not allow any default log to be written
