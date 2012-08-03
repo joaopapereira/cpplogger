@@ -34,7 +34,10 @@ ADD_SUBDIRECTORY( exampleProgram bin )
 INSTALL( FILES include/libJPLogger.h
          DESTINATION ${INSTALL_INCS} )
 
-INSTALL( FILES lib/liblogger.so
+INSTALL( FILES lib/libJPLoggerStatic.a
+         DESTINATION ${INSTALL_LIBS} )
+
+INSTALL( FILES lib/libJPLogger.so
          DESTINATION ${INSTALL_LIBS} )
 
 #####################################
@@ -67,3 +70,5 @@ IF( UNIX )
   )
 ENDIF( UNIX )
 
+set(CMAKE_CXX_FLAGS "-DDEBUG=1")
+set(CMAKE_BUILD_TYPE Debug)
