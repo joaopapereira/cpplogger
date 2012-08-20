@@ -8,7 +8,7 @@ PROJECT_NAME           = "Logger Library"
 PROJECT_NUMBER         = 1
 PROJECT_BRIEF          = Library that implements a logger class
 PROJECT_LOGO           =
-OUTPUT_DIRECTORY       = @CMAKE_CURRENT_BINARY_DIR@
+OUTPUT_DIRECTORY       = @CMAKE_CURRENT_BINARY_DIR@/docs/docs/
 CREATE_SUBDIRS         = YES
 OUTPUT_LANGUAGE        = English
 BRIEF_MEMBER_DESC      = YES
@@ -209,10 +209,10 @@ RTF_EXTENSIONS_FILE    =
 #---------------------------------------------------------------------------
 # configuration options related to the man page output
 #---------------------------------------------------------------------------
-GENERATE_MAN           = NO
+GENERATE_MAN           = YES
 MAN_OUTPUT             = man
-MAN_EXTENSION          = .3
-MAN_LINKS              = NO
+MAN_EXTENSION          = .4
+MAN_LINKS              = YES
 #---------------------------------------------------------------------------
 # configuration options related to the XML output
 #---------------------------------------------------------------------------

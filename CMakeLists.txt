@@ -85,6 +85,8 @@ IF( UNIX )
    CMakeFiles
    bin
    install_*
+   docs/docs/
+   docs/logger.dox
   )
 
   ADD_CUSTOM_COMMAND(
@@ -105,9 +107,9 @@ endif()
 #####################################
 find_package(Doxygen)
 if(DOXYGEN_FOUND)
-	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
-	add_custom_target(doc
-			${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/docs/logger.dox.in ${CMAKE_CURRENT_BINARY_DIR}/docs/logger.dox @ONLY)
+	add_custom_target(docs
+			${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/docs/logger.dox
 			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 			COMMENT "Generating Logger documentation with Doxygen" VERBATIM
 )
