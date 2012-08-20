@@ -57,7 +57,7 @@ endif()
 #####################################
 # Instalation section
 #####################################
-INSTALL( FILES include/libJPLogger.h
+INSTALL( FILES include/libJPLogger.hpp
          DESTINATION ${INSTALL_INCS} )
 
 INSTALL( FILES lib/libJPLoggerStatic.a
