@@ -1,5 +1,13 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
+#####################################
+## Option part
+#####################################
+option(logger_build_samples "Build logger sample programs." OFF)
+option(compile_with_debug "Build library with debug." OFF)
 
+#####################################
+## Definition of environment
+#####################################
 IF( DEFINED ENV{INSTALL_LIB_DIR} )
    SET(INSTALL_LIBS $ENV{INSTALL_LIB_DIR}/ )
 ELSE()
@@ -11,6 +19,7 @@ ELSE()
    SET(INSTALL_INCS ${CMAKE_HOME_DIRECTORY}/include )
 ENDIF()
 
+
 IF( EXISTS ${INSTALL_LIBS}/liblogger.so )
 	return()
 ENDIF()
@@ -19,11 +28,28 @@ ENDIF()
 SET(LIBRARY_OUTPUT_PATH .)
 SET(EXECUTABLE_OUTPUT_PATH .)
 
+
+#####################################
+## Project name
+#####################################
 PROJECT(logger)
+
+#####################################
+## Include directories 
+#####################################
 INCLUDE_DIRECTORIES( include lib )
 
+
+#####################################
+## Folders to be build
+#####################################
 ADD_SUBDIRECTORY( src lib )
-ADD_SUBDIRECTORY( exampleProgram bin )
+#####################################
+## Samples to be build
+#####################################
+if( logger_build_samples)
+	ADD_SUBDIRECTORY( exampleProgram bin )
+endif()
 
 #####################################
 # Search for needed lib
@@ -69,6 +95,20 @@ IF( UNIX )
     TARGET  distclean
   )
 ENDIF( UNIX )
+if( compile_with_debug )
+	set(CMAKE_CXX_FLAGS "-DDEBUG=1")
+	set(CMAKE_BUILD_TYPE Debug)
+endif()
 
-set(CMAKE_CXX_FLAGS "-DDEBUG=1")
-set(CMAKE_BUILD_TYPE Debug)
+#####################################
+# add a target to generate API documentation with Doxygen
+#####################################
+find_package(Doxygen)
+if(DOXYGEN_FOUND)
+	configure_file(${CMAKE_CURRENT_SOURCE_DIR}/Doxyfile.in ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile @ONLY)
+	add_custom_target(doc
+			${DOXYGEN_EXECUTABLE} ${CMAKE_CURRENT_BINARY_DIR}/Doxyfile
+			WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+			COMMENT "Generating Logger documentation with Doxygen" VERBATIM
+)
+endif(DOXYGEN_FOUND)

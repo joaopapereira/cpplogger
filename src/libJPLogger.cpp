@@ -1,10 +1,11 @@
-#include "libJPLogger.h"
+#include "libJPLogger.hpp"
 #include <stdlib.h>
 #include <stdarg.h>
 #include <errno.h>
 #include <string.h>
 
 using namespace std;
+using namespace jpCppLibs;
 
 
 template <typename K, typename V, class C, class A>

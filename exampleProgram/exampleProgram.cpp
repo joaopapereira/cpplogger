@@ -13,7 +13,9 @@
  ============================================================================
  */
 
-#include "libJPLogger.h"
+#include "libJPLogger.hpp"
+
+using namespace jpCppLibs;
 
 // With this option will disable the debug to screen and do not allow any default log to be written
 #define DEBUG 0
