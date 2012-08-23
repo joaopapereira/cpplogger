@@ -1,3 +1,7 @@
+Version 1.0.1:
+Date: 23/08/2012
+The module name can have 6 char padding aligning the type of log in same column
+
 Version 1.0: 
 Date: 20/08/2012
 First complete release

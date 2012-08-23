@@ -3,6 +3,7 @@
 #include <stdarg.h>
 #include <errno.h>
 #include <string.h>
+#include <iomanip>
 
 using namespace std;
 using namespace jpCppLibs;
@@ -264,7 +265,8 @@ int Logger::write( std::string message, std::string module , int type ){
 			throw LoggerExpFileError("Error writing log",true);
 		}
 	}
-	myfile << dateResult << " "<< module << "[" << M_LOG_TRANSLATE[type] << "]" <<"\t"
+	myfile.setf(ios::left);
+	myfile << dateResult << " "<< setw(6) << module << "[" << M_LOG_TRANSLATE[type] << "]" <<"\t"
 			<< message << endl;
 	myfile.flush();
 
