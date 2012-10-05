@@ -1,3 +1,7 @@
+Version 1.0.2:
+Date: 05/10/2012
+Limit the size of the output solving possible segfault
+
 Version 1.0.1:
 Date: 23/08/2012
 The module name can have 6 char padding aligning the type of log in same column

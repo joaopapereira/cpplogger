@@ -187,7 +187,7 @@ void Logger::log( std::string module , int logsev, int type, std::string message
 	char outMsg[5000];
 	std::string toWrite;
 	va_start( args, message.c_str() );
-	vsprintf( outMsg , message.c_str() , args );
+	vsnprintf( outMsg , 5000, message.c_str() , args );
 	va_end( args );
 	message = outMsg;
 	try{
