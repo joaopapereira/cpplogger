@@ -38,7 +38,8 @@ PROJECT(logger)
 ## Include directories 
 #####################################
 INCLUDE_DIRECTORIES( include lib )
-
+find_package (Threads REQUIRED)
+ADD_DEFINITIONS( -std=c++11 -pthread )
 
 #####################################
 ## Folders to be build
@@ -50,6 +51,8 @@ ADD_SUBDIRECTORY( src lib )
 if( logger_build_samples)
 	ADD_SUBDIRECTORY( exampleProgram bin )
 endif()
+
+
 
 #####################################
 # Search for needed lib

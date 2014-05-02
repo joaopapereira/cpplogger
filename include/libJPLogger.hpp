@@ -25,6 +25,8 @@
 #include <map>
 #include <time.h>
 #include <exception>
+#include <mutex>
+#include <memory>
 
 namespace jpCppLibs{
 	/**
@@ -92,7 +94,7 @@ namespace jpCppLibs{
 		 * @param error Error message
 		 * @param showErrno Indicates if the ERRNO should be or not written
 		 */
-		LoggerExpFileError( char* error,bool showErrno = false ) throw();
+		LoggerExpFileError( const char* error,bool showErrno = false ) throw();
 		/**
 		 * Constructor used when no message needs to be passed
 		 * @param error Error message
@@ -214,7 +216,11 @@ namespace jpCppLibs{
 			 * @return Return 0 in case of success
 			 */
 			int copyLoggerDef( Logger * logger );
-	
+		protected:
+			/**
+			 * Mutex to ensure that the class is thread safe
+			 */
+			std::mutex mutex;
 		private:
 			/**
 			 * Map between the modules and the types/levels
@@ -272,13 +278,13 @@ namespace jpCppLibs{
 	 * This class should be used if you need only one
 	 * instance of the logger for all the application
 	 */
-	class OneInstanceLogger: public Logger{
+	class OneInstanceLogger{
 	public:
 		/**
 		 * Get and instance of the logger
 		 * @return An instance to the logger
 		 */
-		static OneInstanceLogger *instance();
+		static Logger &instance();
 	
 	protected:
 		/**
@@ -286,9 +292,18 @@ namespace jpCppLibs{
 		 */
 		OneInstanceLogger();
 		/**
+		 * Copy constructor
+		 */
+		OneInstanceLogger( const OneInstanceLogger&other);
+		/**
+		 * Attribution operator
+		 */
+		OneInstanceLogger& operator= (const OneInstanceLogger& rs);
+		/**
 		 * Logger instance
 		 */
-		static OneInstanceLogger *inst;
+		static std::unique_ptr<Logger> inst;
+		static std::mutex m_mutex;
 	};
 };
 

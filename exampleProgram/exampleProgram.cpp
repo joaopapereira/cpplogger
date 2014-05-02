@@ -29,10 +29,10 @@ int main(void) {
   log.log("After change to low","",M_LOG_LOW,M_LOG_INF);
 
   log.setLogLvl("Ex0",M_LOG_NRM,M_LOG_INF);
-  OneInstanceLogger::instance()->log("Try to log","Ex0",M_LOG_LOW,M_LOG_INF);
+  OneInstanceLogger::instance().log("Try to log","Ex0",M_LOG_LOW,M_LOG_INF);
 
-  OneInstanceLogger::instance()->copyLoggerDef( &log );
-  OneInstanceLogger::instance()->log("After the copy","Ex0",M_LOG_LOW,M_LOG_INF);
+  OneInstanceLogger::instance().copyLoggerDef( &log );
+  OneInstanceLogger::instance().log("After the copy","Ex0",M_LOG_LOW,M_LOG_INF);
 
 
   return 0;

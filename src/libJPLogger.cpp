@@ -20,7 +20,7 @@ std::ostream &operator<< (std::ostream &os, std::map<K,V,C,A> const& m)
 	return os << "}";
 }
 
-LoggerExpFileError::LoggerExpFileError(char* error, bool showErrno ) throw(){
+LoggerExpFileError::LoggerExpFileError(const char* error, bool showErrno ) throw(){
 	setMsg(error);
 	this->showErrno = showErrno;
 }
@@ -186,7 +186,7 @@ void Logger::log( std::string module , int logsev, int type, std::string message
 	va_list args;
 	char outMsg[5000];
 	std::string toWrite;
-	va_start( args, message.c_str() );
+	va_start( args, message );
 	vsnprintf( outMsg , 5000, message.c_str() , args );
 	va_end( args );
 	message = outMsg;
@@ -253,7 +253,7 @@ bool Logger::writable( std::string module , int logsev, int type )
 	return writable;
 }
 int Logger::write( std::string message, std::string module , int type ){
-
+	std::lock_guard<std::mutex> lock(mutex);
 	debugFun( "writing:[" << module << "][" << type <<  "]" << message<<endl);
 	char dateResult[20];
 	{
@@ -280,6 +280,7 @@ int Logger::write( std::string message, std::string module , int type ){
  */
 int
 Logger::setLoggerLevel( const LogModules lvls){
+	std::lock_guard<std::mutex> lock(mutex);
 	debugFun( "Set new log level");
 	Logger::logLvls.clear();
 	Logger::logLvls = (LogModules)lvls;
@@ -304,15 +305,16 @@ Logger::copyLoggerDef( Logger * logger ){
 
 }
 
-OneInstanceLogger* OneInstanceLogger::inst = NULL;
-OneInstanceLogger *
+std::unique_ptr<Logger> OneInstanceLogger::inst = nullptr;
+std::mutex OneInstanceLogger::m_mutex;
+Logger &
 OneInstanceLogger::instance(){
-	if (!inst )
-		inst = new OneInstanceLogger();
-	return inst;
+	if( nullptr == inst ){
+		std::lock_guard<std::mutex> lock(m_mutex);
+		if( nullptr == inst )
+			inst.reset(new Logger());
+	}
+
+	return *inst.get();
 };
 
-OneInstanceLogger::OneInstanceLogger()
-:Logger(){
-
-}
