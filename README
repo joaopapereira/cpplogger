@@ -5,7 +5,7 @@ https://github.com/joaopapereira/cpplogger.git
 
 Overview
 =========
-Library in C++ to implement a logger
+Library in C++11 to implement a logger
 
 With this library it is possible to implement two 
 types of loggers.
@@ -20,6 +20,7 @@ Requirements for End Users
 
 This library do not need any special library installed.
 Uses the base c/c++ functions to implement the logger
+This implementation support uses c++11
 
 
 Building the library

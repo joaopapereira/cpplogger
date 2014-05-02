@@ -39,7 +39,7 @@ PROJECT(logger)
 #####################################
 INCLUDE_DIRECTORIES( include lib )
 find_package (Threads REQUIRED)
-ADD_DEFINITIONS( -std=c++11 -pthread )
+ADD_DEFINITIONS( -std=c++11 ${CMAKE_THREAD_LIBS_INIT} )
 
 #####################################
 ## Folders to be build
