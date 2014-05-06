@@ -170,7 +170,6 @@ Logger::getLogLvls(){
 
 void Logger::log( std::string message , std::string module , int logsev, int type)
 {
-	std::lock_guard<std::mutex> lock(mutex);
 	LogModules::iterator it;
 	LogType::iterator it1;
 
@@ -183,7 +182,6 @@ void Logger::log( std::string message , std::string module , int logsev, int typ
 }
 void Logger::log( std::string module , int logsev, int type, std::string message ,...)
 {
-	std::lock_guard<std::mutex> lock(mutex);
 	va_list args;
 	char outMsg[5000];
 	std::string toWrite;

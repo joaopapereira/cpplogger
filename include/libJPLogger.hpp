@@ -332,8 +332,10 @@ class LoggerTemporaryStream: public std::ostream
 		 */
 		virtual int sync ( )
 		{
-			if(0 == module.compare("-1"))
+			if(0 == module.compare("-1")){
+				str("");
 				return 0;
+			}
 			std::lock_guard<std::mutex> lock(*mutex);
 			char dateResult[20];
 			{
