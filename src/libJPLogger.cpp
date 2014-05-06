@@ -3,11 +3,10 @@
 #include <stdarg.h>
 #include <errno.h>
 #include <string.h>
-#include <iomanip>
+
 
 using namespace std;
 using namespace jpCppLibs;
-
 
 template <typename K, typename V, class C, class A>
 std::ostream &operator<< (std::ostream &os, std::map<K,V,C,A> const& m)
@@ -99,7 +98,7 @@ Logger::setFile(std::string filename ){
 	myfile.open( filename.c_str() , ios::app );
 	if( !myfile.is_open() ){
 		cerr << "Log file:[" << filename <<
-			"] could not be opened" << endl;
+				"] could not be opened" << endl;
 		throw LoggerExpFileError(true);
 	}
 	outputFile = filename;
@@ -145,7 +144,7 @@ Logger::setLogLvl( std::string module , int logsev, int type)
 		ret = Logger::logLvls[module].insert(make_pair ( actType , actlogsev ));
 		if( false == ret.second )
 		{
-			 Logger::logLvls[module][actType] = actlogsev;
+			Logger::logLvls[module][actType] = actlogsev;
 		}
 	}
 
@@ -171,6 +170,7 @@ Logger::getLogLvls(){
 
 void Logger::log( std::string message , std::string module , int logsev, int type)
 {
+	std::lock_guard<std::mutex> lock(mutex);
 	LogModules::iterator it;
 	LogType::iterator it1;
 
@@ -183,6 +183,7 @@ void Logger::log( std::string message , std::string module , int logsev, int typ
 }
 void Logger::log( std::string module , int logsev, int type, std::string message ,...)
 {
+	std::lock_guard<std::mutex> lock(mutex);
 	va_list args;
 	char outMsg[5000];
 	std::string toWrite;
@@ -194,10 +195,19 @@ void Logger::log( std::string module , int logsev, int type, std::string message
 		if( writable(module , logsev, type ) )
 			write( message , module , type );
 	}catch( LoggerExpFileError &e ){
-			cerr << e.what();
+		cerr << e.what();
 	}
 }
-
+std::unique_ptr<LoggerTemporaryStream> Logger::log( std::string module , int logsev, int type)
+{
+	if( writable(module, logsev, type)){
+		std::unique_ptr<LoggerTemporaryStream> p(new LoggerTemporaryStream(myfile, module, M_LOG_TRANSLATE[type], &mutex) );
+		return p;
+	}else{
+		std::unique_ptr<LoggerTemporaryStream> p(new LoggerTemporaryStream(myfile, "-1", "-1", &mutex) );
+		return p;
+	}
+}
 bool Logger::writable( std::string module , int logsev, int type )
 {
 	LogModules::iterator it;
@@ -233,8 +243,8 @@ bool Logger::writable( std::string module , int logsev, int type )
 				//Assumption M_LOG_ALLLVL is always set'ed with the log level by default
 				//cout <<"Mod exist but no cfg for lvl, getting default"<< logLvls[CONST_DEFMODULE][M_LOG_ALLLVL] << ">" <<logsev<< endl;
 				if( logLvls[CONST_DEFMODULE][M_LOG_ALLLVL] > logsev )
-						writable = false;
-			// Configuration for all levels found
+					writable = false;
+				// Configuration for all levels found
 			}else if( logLvls[module][M_LOG_ALLLVL] > logsev )
 				writable = false;
 			//cout <<"Mod exist but no cfg for lvl, getting default of module"<< logLvls[module][M_LOG_ALLLVL] << ">" <<logsev<< endl;
@@ -253,23 +263,23 @@ bool Logger::writable( std::string module , int logsev, int type )
 	return writable;
 }
 int Logger::write( std::string message, std::string module , int type ){
-	std::lock_guard<std::mutex> lock(mutex);
+	//writeLineStart(module, type);
 	debugFun( "writing:[" << module << "][" << type <<  "]" << message<<endl);
-	char dateResult[20];
-	{
-		struct tm *tmp;
-		time_t t = time(NULL);
 
-		tmp = localtime(&t);
-		if (strftime(dateResult, sizeof(dateResult), "%Y-%m-%d %H:%M:%S", tmp) == 0) {
-			throw LoggerExpFileError("Error writing log",true);
-		}
-	}
-	myfile.setf(ios::left);
-	myfile << dateResult << " "<< setw(6) << module << "[" << M_LOG_TRANSLATE[type] << "]" <<"\t"
-			<< message << endl;
+	//myfile << message << endl;
+	//myfile.flush();
+	LoggerTemporaryStream(myfile, module, M_LOG_TRANSLATE[type], &mutex) << message << endl;
+
+
+	return 0;
+}
+int Logger::write(std::string message){
+
+	debugFun( "writing:[" << message<<endl);
+
+	myfile.setf(std::ios::left);
+	myfile << message;
 	myfile.flush();
-
 
 	return 0;
 }

@@ -12,7 +12,7 @@
                Here the script will be called exampleProgram.
  ============================================================================
  */
-#define DEBUG 0
+#define DEBUG 1
 #include "libJPLogger.hpp"
 
 using namespace jpCppLibs;
@@ -20,6 +20,7 @@ using namespace jpCppLibs;
 
 int main(void) {
   Logger log("/tmp/test.log");
+  log.setLogLvl("ALL",M_LOG_MIN,M_LOG_ALLLVL);
   log.log("Before first set","Ex1",M_LOG_LOW,M_LOG_INF);
   log.setLogLvl("Ex1",M_LOG_MIN,M_LOG_INF);
   log.log("Before change to normal","Ex1",M_LOG_LOW,M_LOG_INF);
@@ -37,9 +38,11 @@ int main(void) {
   OneInstanceLogger::instance().setLogLvl("Ex1",M_LOG_NRM,M_LOG_INF);
   OneInstanceLogger::instance().log("After copied change","Ex1",M_LOG_LOW,M_LOG_INF);
 
-  log.setLogLvl("Ex1Set1",M_LOG_MIN,M_LOG_WRN);
-  log.log("I will appear","Ex1Set1",M_LOG_LOW,M_LOG_WRN);
-  OneInstanceLogger::instance().log("But i will not","Ex1Set1",M_LOG_LOW,M_LOG_WRN);
+  log.log("New module writting","Ex1Set1",M_LOG_LOW,M_LOG_WRN);
+  OneInstanceLogger::instance().log("Also in the singleton","Ex1Set1",M_LOG_LOW,M_LOG_WRN);
+  log.setLogLvl("Ex1Set1",M_LOG_MAX,M_LOG_WRN);
+  log.log("I will not appear","Ex1Set1",M_LOG_LOW,M_LOG_WRN);
+  OneInstanceLogger::instance().log("But i will be written","Ex1Set1",M_LOG_LOW,M_LOG_WRN);
 
 
   return 0;
