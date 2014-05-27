@@ -309,7 +309,7 @@ private:
 	 * load configuration to the the logger
 	 */
 	void load();
-	friend LoggerTemporaryStream;
+	friend class LoggerTemporaryStream;
 };
 /**
  * Class used as stream to write to the file
