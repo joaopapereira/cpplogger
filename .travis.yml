@@ -8,7 +8,8 @@ before_script:
   - cmake ..
 before_install:
 # libstdc++-4.8-dev
-    - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test libboost-dev
+    - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
+    - sudo apt-get install -qq libboost-dev
 # clang++-3.2
     - sudo add-apt-repository --yes ppa:h-rayflood/llvm
     - sudo apt-get -qq update
