@@ -1,7 +1,7 @@
 Logger class
 =========
 
-https://github.com/joaopapereira/cpplogger.git
+https://github.com/joaopapereira/cpplogger.git  [![Build Status](https://travis-ci.org/joaopapereira/cpplogger.svg?branch=master)](https://travis-ci.org/joaopapereira/cpplogger)
 
 Overview
 =========
@@ -20,7 +20,7 @@ Requirements for End Users
 
 This library do not need any special library installed.
 Uses the base c/c++ functions to implement the logger
-This implementation support uses c++11
+This implementation support uses c++11. If C++11 compiler is not present it uses Boost as an alternative.
 
 
 Building the library
@@ -52,3 +52,7 @@ command with
 
   cmake -Dcompile_with_debug=ON ${LOGGER_DIR}
 
+If you want to build the library with Boost instead of c++11 support 
+you should replace the command with
+
+  cmake -Dforce_boost=ON ${LOGGER_DIR}
