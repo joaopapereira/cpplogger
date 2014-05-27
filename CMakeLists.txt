@@ -4,6 +4,7 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 #####################################
 option(logger_build_samples "Build logger sample programs." OFF)
 option(compile_with_debug "Build library with debug." OFF)
+option(force_boost "Force BOOST usage instead of C++11." OFF)
 
 #####################################
 ## Definition of environment
@@ -39,7 +40,27 @@ PROJECT(logger)
 #####################################
 INCLUDE_DIRECTORIES( include lib )
 find_package (Threads REQUIRED)
-ADD_DEFINITIONS( -std=c++11 ${CMAKE_THREAD_LIBS_INIT} )
+if ("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU" AND NOT force_boost)
+    execute_process(
+        COMMAND ${CMAKE_CXX_COMPILER} -dumpversion OUTPUT_VARIABLE GCC_VERSION)
+    if (NOT (GCC_VERSION VERSION_GREATER 4.7 OR GCC_VERSION VERSION_EQUAL 4.7))
+        message("GCC Without c++11")
+        FIND_PACKAGE( Boost 1.40 COMPONENTS program_options REQUIRED )
+	INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
+        ADD_DEFINITIONS( -DUSE_BOOST_INSTEAD_CXX11 ${CMAKE_THREAD_LIBS_INIT} )
+    	SET(ADDITIONAL_LINK_LIBS boost_system)
+    else()
+        message("GCC With c++11")
+        ADD_DEFINITIONS( -std=c++11 ${CMAKE_THREAD_LIBS_INIT} )
+    	SET(ADDITIONAL_LINK_LIBS )
+    endif ()
+else ()
+    message("Force Boost")
+    FIND_PACKAGE( Boost 1.40 COMPONENTS program_options REQUIRED )
+    INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
+    ADD_DEFINITIONS( -DUSE_BOOST_INSTEAD_CXX11 ${CMAKE_THREAD_LIBS_INIT} )
+    SET(ADDITIONAL_LINK_LIBS boost_system)
+endif ()
 
 #####################################
 ## Folders to be build

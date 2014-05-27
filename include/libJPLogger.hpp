@@ -5,17 +5,15 @@
  *  This file is part of libJPLogger.
  *
  *  libJPSemaphores is free software: you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
+ *  it under the terms of the MIT License as published by
  *  the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
  *  libJPSemaphores is distributed in the hope that it will be useful,
  *  but WITHOUT ANY WARRANTY; without even the implied warranty of
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
+ *  MIT License for more details.
  *
- *  You should have received a copy of the GNU General Public License
- *  along with libJPLogger.  If not, see <http://www.gnu.org/licenses/>.
  */
 #ifndef libJPLogger_H
 #define libJPLogger_H
@@ -25,10 +23,31 @@
 #include <map>
 #include <time.h>
 #include <exception>
-#include <mutex>
 #include <memory>
 #include <iomanip>
 #include <sstream>
+#ifdef USE_BOOST_INSTEAD_CXX11
+#include <boost/thread/mutex.hpp>
+#include <boost/scoped_ptr.hpp>
+#include <boost/interprocess/smart_ptr/unique_ptr.hpp>
+namespace std{
+    template<class T>
+    class lock_guard{
+      T locker;
+      public:
+        lock_guard(T locker): locker(locker){
+            locker->lock();
+        };
+        ~lock_guard(){
+            locker->unlock();
+        };
+    };
+    typedef boost::mutex mutex;
+};
+
+#else
+#include <mutex>
+#endif
 
 namespace jpCppLibs{
 /**
@@ -197,7 +216,11 @@ public:
 	 * @param logsev Log severity
 	 * @param type Type of the log
 	 */
+#ifdef USE_BOOST_INSTEAD_CXX11
+	boost::shared_ptr<LoggerTemporaryStream> log(std::string module , int logsev, int type );
+#else
 	std::unique_ptr<LoggerTemporaryStream> log(std::string module , int logsev, int type );
+#endif
 	/**
 	 * Change a log level of a module
 	 * @param module Name of the module
@@ -336,7 +359,11 @@ class LoggerTemporaryStream: public std::ostream
 				str("");
 				return 0;
 			}
+#ifdef USE_BOOST_INSTEAD_CXX11
+			std::lock_guard<std::mutex*> lock(mutex);
+#else
 			std::lock_guard<std::mutex> lock(*mutex);
+#endif
 			char dateResult[20];
 			{
 				struct tm *tmp;
@@ -379,7 +406,11 @@ class LoggerTemporaryStream: public std::ostream
 	 * @param val Value to write
 	 */
 	template<typename T>
+#ifdef USE_BOOST_INSTEAD_CXX11
+	inline friend boost::shared_ptr<LoggerTemporaryStream> const&operator<<(boost::shared_ptr<LoggerTemporaryStream>const&os, const T&val){
+#else
 	inline friend std::unique_ptr<LoggerTemporaryStream> const&operator<<(std::unique_ptr<LoggerTemporaryStream>const&os, const T&val){
+#endif
 		*os << val;
 		return os;
 	}
@@ -388,7 +419,11 @@ class LoggerTemporaryStream: public std::ostream
 	 * @param os Current Stream
 	 * @param val Value to write
 	 */
+#ifdef USE_BOOST_INSTEAD_CXX11
+	inline friend boost::shared_ptr<LoggerTemporaryStream> const&operator<<(boost::shared_ptr<LoggerTemporaryStream>const&os, std::ostream&(*f)(std::ostream&) )
+#else
 	inline friend std::unique_ptr<LoggerTemporaryStream> const&operator<<(std::unique_ptr<LoggerTemporaryStream>const&os, std::ostream&(*f)(std::ostream&) )
+#endif
 	{
 		*os << f;
 		return os;
@@ -424,7 +459,11 @@ protected:
 	/**
 	 * Logger instance
 	 */
+#ifdef USE_BOOST_INSTEAD_CXX11
+	static boost::shared_ptr<Logger> inst;
+#else
 	static std::unique_ptr<Logger> inst;
+#endif
 	/**
 	 * Mutex to ensure that only 1 instance
 	 * exist

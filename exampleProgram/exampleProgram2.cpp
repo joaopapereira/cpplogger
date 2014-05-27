@@ -3,7 +3,7 @@
  Name        : exampleProgram2.c
  Author      : Joao Pereira
  Version     :
- Copyright   : This library is creating under the GPL license
+ Copyright   : This library is creating under the MIT license
  Description : Uses shared library to print greeting
                To run the resulting executable the LD_LIBRARY_PATH must be
                set to ${project_loc}/libJPLogger/.libs
@@ -22,8 +22,8 @@ int main(void) {
   Logger log("/tmp/test.log");
   log.setLogLvl("ALL",M_LOG_MIN,M_LOG_ALLLVL);
 
-  auto infLogger = log.log("MOD1", M_LOG_NRM, M_LOG_INF);
-  infLogger<< "Testing new functionality" << std::endl;
+  //auto infLogger = log.log("MOD1", M_LOG_NRM, M_LOG_INF);
+  log.log("MOD1", M_LOG_NRM, M_LOG_INF) << "Testing new functionality" << std::endl;
   log.log("MOD1", M_LOG_NRM, M_LOG_INF) << "Testing new functionality" << std::endl;
 
   {

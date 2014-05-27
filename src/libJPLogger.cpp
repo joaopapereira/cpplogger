@@ -196,13 +196,25 @@ void Logger::log( std::string module , int logsev, int type, std::string message
 		cerr << e.what();
 	}
 }
+#ifdef USE_BOOST_INSTEAD_CXX11
+boost::shared_ptr<LoggerTemporaryStream> Logger::log( std::string module , int logsev, int type)
+#else
 std::unique_ptr<LoggerTemporaryStream> Logger::log( std::string module , int logsev, int type)
+#endif
 {
 	if( writable(module, logsev, type)){
+#ifdef USE_BOOST_INSTEAD_CXX11
+		boost::shared_ptr<LoggerTemporaryStream> p(new LoggerTemporaryStream(myfile, module, M_LOG_TRANSLATE[type], &mutex) );
+#else
 		std::unique_ptr<LoggerTemporaryStream> p(new LoggerTemporaryStream(myfile, module, M_LOG_TRANSLATE[type], &mutex) );
+#endif
 		return p;
 	}else{
+#ifdef USE_BOOST_INSTEAD_CXX11
+		boost::shared_ptr<LoggerTemporaryStream> p(new LoggerTemporaryStream(myfile, "-1", "-1", &mutex) );
+#else
 		std::unique_ptr<LoggerTemporaryStream> p(new LoggerTemporaryStream(myfile, "-1", "-1", &mutex) );
+#endif
 		return p;
 	}
 }
@@ -266,7 +278,13 @@ int Logger::write( std::string message, std::string module , int type ){
 
 	//myfile << message << endl;
 	//myfile.flush();
+
+#ifdef USE_BOOST_INSTEAD_CXX11
+	boost::shared_ptr<LoggerTemporaryStream> p(new LoggerTemporaryStream(myfile, module, M_LOG_TRANSLATE[type], &mutex) );
+	p << message  << std::endl;
+#else
 	LoggerTemporaryStream(myfile, module, M_LOG_TRANSLATE[type], &mutex) << message << endl;
+#endif
 
 
 	return 0;
@@ -288,7 +306,11 @@ int Logger::write(std::string message){
  */
 int
 Logger::setLoggerLevel( const LogModules lvls){
+#ifdef USE_BOOST_INSTEAD_CXX11
+	std::lock_guard<std::mutex*> lock(&mutex);
+#else
 	std::lock_guard<std::mutex> lock(mutex);
+#endif
 	debugFun( "Set new log level");
 	Logger::logLvls.clear();
 	Logger::logLvls = (LogModules)lvls;
@@ -313,16 +335,27 @@ Logger::copyLoggerDef( Logger * logger ){
 
 }
 
+#ifdef USE_BOOST_INSTEAD_CXX11
+boost::shared_ptr<Logger> OneInstanceLogger::inst(new Logger());
+#else
 std::unique_ptr<Logger> OneInstanceLogger::inst = nullptr;
+#endif
 std::mutex OneInstanceLogger::m_mutex;
 Logger &
 OneInstanceLogger::instance(){
+#ifdef USE_BOOST_INSTEAD_CXX11
+	if( NULL == inst ){
+		std::lock_guard<std::mutex*> lock(&m_mutex);
+		if( NULL == inst )
+			inst.reset(new Logger());
+	}
+#else
 	if( nullptr == inst ){
 		std::lock_guard<std::mutex> lock(m_mutex);
 		if( nullptr == inst )
 			inst.reset(new Logger());
 	}
-
+#endif
 	return *inst.get();
 };
 

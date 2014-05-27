@@ -3,7 +3,7 @@
  Name        : exampleProgram.c
  Author      : Joao Pereira
  Version     :
- Copyright   : This library is creating under the GPL license
+ Copyright   : This library is creating under the MIT license
  Description : Uses shared library to print greeting
                To run the resulting executable the LD_LIBRARY_PATH must be
                set to ${project_loc}/libJPLogger/.libs
